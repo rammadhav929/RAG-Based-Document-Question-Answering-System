@@ -1,4 +1,4 @@
-# RAG-Based Document Question Answering System | Python, FastAPI, FAISS, SentenceTransformers, HuggingFace
+# RAG-Based Document Question Answering System 
 - Architected a Retrieval Augmented Generation (RAG) pipeline for semantic QA and summarization over PDF document
 - Engineered document ingestion workflow with text extraction, semantic chunking, and embedding generation using SentenceTransformers
 - Constructed FAISS-based vector retrieval layer to surface contextually relevant document segments
