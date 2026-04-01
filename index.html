@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+  <head>
+    <title>RAG-Based Answering System</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #5f9cff, #7b5fff);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .card {
+        width: 720px;
+        background: white;
+        border-radius: 18px;
+        padding: 35px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 22px; /* ⭐ GLOBAL SPACING SYSTEM */
+      }
+
+      .title {
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .uploadBox {
+        border: 2px dashed #cfcfcf;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .uploadBox:hover {
+        background: #222327;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      input[type="text"] {
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        font-size: 15px;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      button {
+        background: #5f9cff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 15px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #4b86e8;
+      }
+
+      .chat {
+        height: 280px;
+        background: #f4f6fb;
+        border-radius: 14px;
+        padding: 18px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .msgUser {
+        align-self: flex-end;
+        background: #5f9cff;
+        color: white;
+        padding: 10px 14px;
+        border-radius: 12px;
+        max-width: 75%;
+      }
+
+      .msgBot {
+        align-self: flex-start;
+        background: white;
+        border: 1px solid #ddd;
+        padding: 10px 14px;
+        border-radius: 12px;
+        max-width: 75%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <div class="title">📄 RAG-Based Answering System</div>
+
+      <label class="uploadBox">
+        Click to Upload Resume PDF
+        <input id="pdfFile" type="file" />
+      </label>
+
+      <input
+        id="question"
+        type="text"
+        placeholder="Ask question about resume..."
+      />
+
+      <div class="actions">
+        <button onclick="ask()">Ask</button>
+      </div>
+
+      <div id="chat" class="chat"></div>
+    </div>
+
+    <script>
+      document.getElementById("pdfFile").addEventListener("change", uploadPDF);
+
+      async function uploadPDF() {
+        let fileInput = document.getElementById("pdfFile");
+
+        if (fileInput.files.length === 0) {
+          alert("Please select a PDF first");
+          return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        try {
+          alert("Uploading... please wait");
+
+          let res = await fetch("http://127.0.0.1:8000/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          // ⭐ check HTTP status
+          if (!res.ok) {
+            let err = await res.json();
+            alert("Upload Failed: " + err.detail);
+            return;
+          }
+
+          let data = await res.json();
+
+          alert(data.message || "Resume Indexed Successfully ✅");
+        } catch (e) {
+          alert("Server not reachable / CORS issue / Backend not running");
+          console.error(e);
+        }
+      }
+
+      async function ask() {
+        let q = document.getElementById("question").value;
+        let chat = document.getElementById("chat");
+
+        if (q.trim() === "") {
+          alert("Type question first");
+          return;
+        }
+
+        chat.innerHTML += `<div class="msgUser">${q}</div>`;
+
+        try {
+          let res = await fetch("http://127.0.0.1:8000/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: q }),
+          });
+
+          if (!res.ok) {
+            alert("Error getting answer");
+            return;
+          }
+
+          let data = await res.json();
+
+          chat.innerHTML += `<div class="msgBot">${data.answer}</div>`;
+          chat.scrollTop = chat.scrollHeight;
+        } catch (e) {
+          alert("Backend not reachable");
+          console.error(e);
+        }
+      }
+    </script>
+  </body>
+</html>
