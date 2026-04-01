@@ -1,4 +1,4 @@
-Libraries:-
+# Libraries:-
 
 fitz (PyMuPDF): Used to open, read, and extract text or images from PDF documents.
 
