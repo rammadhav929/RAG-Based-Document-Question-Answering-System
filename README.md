@@ -1,3 +1,11 @@
+# RAG-Based Document Question Answering System | Python, FastAPI, FAISS, SentenceTransformers, HuggingFace
+- Architected a Retrieval Augmented Generation (RAG) pipeline for semantic QA and summarization over PDF document
+- Engineered document ingestion workflow with text extraction, semantic chunking, and embedding generation using SentenceTransformers
+- Constructed FAISS-based vector retrieval layer to surface contextually relevant document segments
+- Leveraged Meta Llama-3.1-8B-Instruct via HuggingFace for grounded context-aware response generation
+- Orchestrated FastAPI service layer for document upload, indexing lifecycle, and real-time query execution
+- Optimized retrieval latency through persistent vector indexing and elimination of redundant embedding computation
+
 # Libraries:-
 
 fitz (PyMuPDF): Used to open, read, and extract text or images from PDF documents.
